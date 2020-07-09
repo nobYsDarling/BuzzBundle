@@ -1,6 +1,6 @@
 <?php
 
-namespace Buzz\Bundle\BuzzBundle\Tests\DependencyInjection\Factory\Message;
+namespace Buzz\Bundle\BuzzBundle\Tests\DependencyInjection\Compiler;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\FileLocator;
@@ -9,12 +9,16 @@ use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 
 use Buzz\Bundle\BuzzBundle\DependencyInjection\BuzzExtension;
 use Buzz\Bundle\BuzzBundle\DependencyInjection\Compiler\BrowserPass;
+use Buzz\Listener\ListenerChain;
+use Buzz\Browser;
+use Buzz\Client\FileGetContents;
+use Buzz\Listener\CallbackListener;
 
 class BrowserPassTest extends TestCase
 {
     public function testProcessNoConfig()
     {
-        $container = $this->createMock('Symfony\Component\DependencyInjection\ContainerBuilder');
+        $container = $this->createMock(ContainerBuilder::class);
         $browserPass = new BrowserPass();
 
         $return = $browserPass->process($container);
@@ -33,7 +37,7 @@ class BrowserPassTest extends TestCase
 
         $listener = $container->getDefinition('buzz.listener.host_foo');
         $this->assertEquals('my://foo', $listener->getArgument(0));
-        $this->assertInstanceOf('Buzz\Listener\ListenerChain', $browser->getListener());
+        $this->assertInstanceOf(ListenerChain::class, $browser->getListener());
         $listeners = $browser->getListener()->getListeners();
         $this->assertCount(2, $listeners, 'Two listeners defined in config');
         $this->assertEquals($listeners[0], $container->get('buzz.listener.host_foo'));
@@ -50,20 +54,20 @@ class BrowserPassTest extends TestCase
 
         $container
             ->register('buzz.browser.my_foo')
-            ->setClass('Buzz\Browser')
+            ->setClass(Browser::class)
             ->setArguments(array(null, null))
             ->addTag('buzz.browser', array('alias' => 'foo'))
         ;
 
         $container
             ->register('buzz.client.foo')
-            ->setClass('Buzz\Client\FileGetContents')
+            ->setClass(FileGetContents::class)
             ->setArguments(array(null, null))
         ;
 
         $container
             ->register('bar')
-            ->setClass('Buzz\Listener\CallbackListener')
+            ->setClass(CallbackListener::class)
             ->setArguments(array(function(){ return; }))
         ;
 

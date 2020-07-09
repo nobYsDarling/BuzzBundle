@@ -15,7 +15,7 @@ class BuzzDataCollectorTest extends TestCase
 {
     protected function setUp(): void
     {
-        if (!class_exists('Symfony\Component\HttpFoundation\Request')) {
+        if (!class_exists(Request::class)) {
             $this->markTestSkipped('The "HttpFoundation" component is not available');
         }
     }
@@ -47,8 +47,8 @@ class BuzzDataCollectorTest extends TestCase
     public function getTestEntry()
     {
         return array(
-            new Entry($this->createMock('Buzz\Message\Request'), $this->createMock('Buzz\Message\Response'), 2),
-            new Entry($this->createMock('Buzz\Message\Request'), $this->createMock('Buzz\Message\Response'), 9),
+            new Entry($this->createMock(\Buzz\Message\Request::class), $this->createMock('Buzz\Message\Response'), 2),
+            new Entry($this->createMock(\Buzz\Message\Request::class), $this->createMock('Buzz\Message\Response'), 9),
         );
     }
 }
